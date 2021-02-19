@@ -21,7 +21,6 @@ body{
   list-style: none;
 }
 
-
 li{
   padding: 0.5rem;
   font-size: 1.1rem;
@@ -29,6 +28,11 @@ li{
 
 li:nth-child(odd){
   background: grey;
+}
+
+.user-status{
+  color: red;
+  background: white!important;
 }
 
 #form{

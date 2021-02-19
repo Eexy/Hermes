@@ -30,13 +30,28 @@
       });
 
       socket.on('chat message', function (msg) {
-        console.log(msg);
         const msgItem = document.createElement('li');
         msgItem.classList.add('message');
 
         msgItem.textContent = msg;
         messages.appendChild(msgItem);
-      })
+      });
+
+      socket.on('user connected', (msg) => {
+        const msgItem = document.createElement('li');
+        msgItem.classList.add('message', 'user-status');
+
+        msgItem.textContent = msg;
+        messages.appendChild(msgItem);
+      });
+
+      socket.on('user disconnected', (msg) => {
+        const msgItem = document.createElement('li');
+        msgItem.classList.add('message', 'user-status');
+
+        msgItem.textContent = msg;
+        messages.appendChild(msgItem);
+      });
     </script>
   </body>
 </html>

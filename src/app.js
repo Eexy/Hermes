@@ -13,8 +13,11 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('An user is connected');
+  io.emit('user connected', 'A new user is connected');
 
+  socket.on('disconnect', () => {
+    io.emit('user disconnected', 'An user is disconnected');
+  });
   // When we receive a message we broadcast it to everyone
   socket.on('chat message',(msg) => {
     io.emit('chat message', msg);
