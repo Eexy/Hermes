@@ -18,6 +18,11 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     io.emit('user disconnected', 'An user is disconnected');
   });
+
+  socket.on('user typing', () => {
+    io.emit('user typing', 'user is typing');
+  });
+
   // When we receive a message we broadcast it to everyone
   socket.on('chat message',(msg) => {
     io.emit('chat message', msg);
@@ -25,5 +30,5 @@ io.on('connection', (socket) => {
 });
 
 http.listen(port, () => {
-  console.log(`Socket.IO server running at http://localhost:${port}/`);
+  console.log(`Socket.IO server running at ${port}`);
 });

@@ -29,6 +29,14 @@
         }
       });
 
+      input.addEventListener('input', function(e) {
+        socket.emit('user typing');
+      });
+
+      socket.on('user typing', (msg) => {
+        console.log(msg);
+      })
+
       socket.on('chat message', function (msg) {
         const msgItem = document.createElement('li');
         msgItem.classList.add('message');
