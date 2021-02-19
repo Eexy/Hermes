@@ -1,0 +1,48 @@
+*{
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html, body{
+  height: 100%;
+}
+
+body{
+  display: flex;
+  flex-direction: column;
+}
+
+.messages, #form{
+  padding: 0.5rem;
+}
+
+.messages{
+  list-style: none;
+}
+
+.message{
+  padding: 0.5rem 0;
+}
+
+.message p{
+  padding: 0;
+}
+
+#form{
+  display: flex;
+  background: black;
+  margin-top: auto;
+}
+
+#form input{
+  flex-grow: 1;
+  font-size: 1.1rem;
+  margin-right: 0.3rem;
+}
+
+#form button{
+  background: blue;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
