@@ -12,20 +12,23 @@ body{
   flex-direction: column;
 }
 
-.messages, #form{
+#form{
   padding: 0.5rem;
 }
 
 .messages{
+  padding: 0;
   list-style: none;
 }
 
-.message{
-  padding: 0.5rem 0;
+
+li{
+  padding: 0.5rem;
+  font-size: 1.1rem;
 }
 
-.message p{
-  padding: 0;
+li:nth-child(odd){
+  background: grey;
 }
 
 #form{

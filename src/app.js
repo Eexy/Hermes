@@ -1,17 +1,26 @@
 const express = require('express');
-const helmet = require('helmet');
-const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const path = require('path');
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const port = process.env.PORT || 3000;
 
-app.use(helmet());
-
-// Set public directory
-const publicDir = path.join(__dirname, './public');
+const publicDir = path.join(__dirname, '/public');
 app.use(express.static(publicDir));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, './public/html/index.html'));
-})
+  res.sendFile(__dirname + '/public/html/index.html');
+});
 
-app.listen(PORT, () => console.log(`Listening port ${PORT}`));
+io.on('connection', (socket) => {
+  console.log('An user is connected');
+
+  // When we receive a message we broadcast it to everyone
+  socket.on('chat message',(msg) => {
+    io.emit('chat message', msg);
+  });
+});
+
+http.listen(port, () => {
+  console.log(`Socket.IO server running at http://localhost:${port}/`);
+});

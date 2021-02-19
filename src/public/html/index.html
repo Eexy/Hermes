@@ -13,5 +13,30 @@
       <input type="text" autocomplete="off" />
       <button>Send</button>
     </form>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script>
+      const socket = new io();
+
+      const messages = document.querySelector('.messages');
+      const form = document.querySelector('#form');
+      const input = document.querySelector('input');
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if(input.value){
+          socket.emit('chat message', input.value);
+          input.value = '';
+        }
+      });
+
+      socket.on('chat message', function (msg) {
+        console.log(msg);
+        const msgItem = document.createElement('li');
+        msgItem.classList.add('message');
+
+        msgItem.textContent = msg;
+        messages.appendChild(msgItem);
+      })
+    </script>
   </body>
 </html>
