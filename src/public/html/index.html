@@ -16,46 +16,43 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = new io();
+      const messages = document.querySelector(".messages");
+      const form = document.querySelector("#form");
+      const input = document.querySelector("input");
 
-      const messages = document.querySelector('.messages');
-      const form = document.querySelector('#form');
-      const input = document.querySelector('input');
+      let name = prompt("Enter your name please:");
 
-      form.addEventListener('submit', function(e) {
+      form.addEventListener("submit", function (e) {
         e.preventDefault();
-        if(input.value){
-          socket.emit('chat message', input.value);
-          input.value = '';
+        if (input.value) {
+          socket.emit("chat message", { name, msg: input.value });
+          input.value = "";
         }
       });
 
-      input.addEventListener('input', function(e) {
-        socket.emit('user typing');
-      });
-
-      socket.on('user typing', (msg) => {
+      socket.on("user typing", (msg) => {
         console.log(msg);
-      })
+      });
 
-      socket.on('chat message', function (msg) {
-        const msgItem = document.createElement('li');
-        msgItem.classList.add('message');
+      socket.on("chat message", function (msg) {
+        const msgItem = document.createElement("li");
+        msgItem.classList.add("message");
+
+        msgItem.textContent = `${msg.name}: ${msg.msg}`;
+        messages.appendChild(msgItem);
+      });
+
+      socket.on("user connected", (msg) => {
+        const msgItem = document.createElement("li");
+        msgItem.classList.add("message", "user-status");
 
         msgItem.textContent = msg;
         messages.appendChild(msgItem);
       });
 
-      socket.on('user connected', (msg) => {
-        const msgItem = document.createElement('li');
-        msgItem.classList.add('message', 'user-status');
-
-        msgItem.textContent = msg;
-        messages.appendChild(msgItem);
-      });
-
-      socket.on('user disconnected', (msg) => {
-        const msgItem = document.createElement('li');
-        msgItem.classList.add('message', 'user-status');
+      socket.on("user disconnected", (msg) => {
+        const msgItem = document.createElement("li");
+        msgItem.classList.add("message", "user-status");
 
         msgItem.textContent = msg;
         messages.appendChild(msgItem);
