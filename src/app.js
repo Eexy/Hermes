@@ -1,31 +1,40 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const path = require('path');
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const path = require("path");
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
 const port = process.env.PORT || 3000;
 
-const publicDir = path.join(__dirname, '/public');
+const publicDir = path.join(__dirname, "/public");
 app.use(express.static(publicDir));
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/html/index.html');
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/public/html/index.html");
 });
 
-io.on('connection', (socket) => {
-  io.emit('user connected', 'A new user is connected');
+let currentUsers = [];
 
-  socket.on('disconnect', () => {
-    io.emit('user disconnected', 'An user is disconnected');
+io.on("connection", (socket) => {
+  socket.on("disconnect", () => {
+    let disconnectedUser = currentUsers.find(user => user.id == socket.id);
+    currentUsers = currentUsers.filter((user) => user.id !== socket.id);
+
+    io.emit("user disconnected", { disconnectedUser, currentUsers });
   });
 
-  socket.on('user typing', () => {
-    io.emit('user typing', 'user is typing');
+  socket.on("user join", (msg) => {
+    const user = { id: socket.id, name: msg };
+    currentUsers.push(user);
+    io.emit("user join", { user, currentUsers });
+  });
+
+  socket.on("user typing", () => {
+    io.emit("user typing", "user is typing");
   });
 
   // When we receive a message we broadcast it to everyone
-  socket.on('chat message',(msg) => {
-    io.emit('chat message', msg);
+  socket.on("chat message", (msg) => {
+    io.emit("chat message", msg);
   });
 });
 
