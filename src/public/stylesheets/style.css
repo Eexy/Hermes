@@ -25,25 +25,25 @@ section{
   border-right: 1px solid black;
 }
 
-.messages, .users-list, .rooms-list{
+.messages, .users__list, .rooms__list{
   padding: 0;
   list-style: none;
   overflow-y: auto;
 }
 
-.section-title{
+.section__title{
   text-align: center;
   padding: 0.3rem;
   border-bottom: 1px solid black;
 }
 
 
-.users-list{
+.users__list{
   display: none;
   width: 200px;
 }
 
-.room:hover, .user-name:hover{
+.room:hover, .user:hover{
   cursor: pointer;
   background: blue;
   color: white;
@@ -84,7 +84,7 @@ li{
 }
 
 @media screen and (min-width: 950px){
-  .users-list{
+  .users__list{
     display: block;
   }
 }
