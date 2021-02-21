@@ -3,6 +3,7 @@ const app = express();
 const path = require("path");
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
+const {v5: uuidv5} = require('uuid');
 const port = process.env.PORT || 3000;
 
 const publicDir = path.join(__dirname, "/public");
@@ -13,6 +14,7 @@ app.get("/", (req, res) => {
 });
 
 let currentUsers = [];
+let rooms = new Map();
 
 io.on("connection", (socket) => {
   socket.on("disconnect", () => {
@@ -20,6 +22,11 @@ io.on("connection", (socket) => {
     currentUsers = currentUsers.filter((user) => user.id !== socket.id);
 
     io.emit("user disconnected", { disconnectedUser, currentUsers });
+  });
+
+  socket.on('join private chat', (id) => {
+    const roomId = uuidv5();
+    socket.join(roomId);
   });
 
   socket.on("user join", (msg) => {
