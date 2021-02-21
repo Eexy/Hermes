@@ -31,11 +31,28 @@ socket.on("connected", (id) => (me.id = id));
 
 window.addEventListener("DOMContentLoaded", getUserName);
 
-socket.on("join room", (room) => {
-  me.dest = room.name;
-  getUsersList(room.users);
-  getMessages(room.messages);
-});
+socket.on("join room", joinRoom);
+
+function joinRoom(newRoom){
+  console.log(newRoom);
+  const rooms = document.querySelectorAll('.room');
+
+  rooms.forEach((room) => {
+    if(room.dataset.destId === newRoom.name){
+      if(!room.classList.contains('active')){
+        room.classList.add('active');
+      }
+    }else{
+      if(room.classList.contains('active')){
+        room.classList.remove('active');
+      }
+    }
+  });
+
+  me.dest = newRoom.name;
+  getUsersList(newRoom.users);
+  getMessages(newRoom.messages);
+}
 
 function getUsersList(users) {
   const usersList = document.querySelector(".users__list");
@@ -56,8 +73,10 @@ function getUsersList(users) {
   });
 }
 
-function switchRoom(){
+function switchRoom(e){
+  const room = e.target;
 
+  socket.emit("join room", room.dataset.destId, me.id);
 }
 
 function isRoomAlreadyExist(id){
@@ -90,6 +109,18 @@ function createPrivateRoom(e){
   }
 }
 
+function updateRoomsListEvent(){
+  const rooms = document.querySelectorAll('.room');
+
+  if(rooms){
+    rooms.forEach(room => {
+      room.addEventListener('click', switchRoom);
+    });
+  }
+}
+
+updateRoomsListEvent();
+
 function getMessages(messages) {
   const messagesList = document.querySelector(".messages");
 
@@ -112,15 +143,18 @@ socket.on("user join", (users) => {
 });
 
 function handleNewMessage(message){
-  const messagesList = document.querySelector('.messages');
-
-  // create message element
-  const li = document.createElement('li');
-  li.classList.add('message');
-  li.textContent = message.message;
-
-  // append the new message and scroll to the bottom
-  messagesList.appendChild(li);
+  // On check if we are in the correct room
+  if(message.dest === me.dest){
+    const messagesList = document.querySelector('.messages');
+  
+    // create message element
+    const li = document.createElement('li');
+    li.classList.add('message');
+    li.textContent = message.message;
+  
+    // append the new message and scroll to the bottom
+    messagesList.appendChild(li);
+  }
 }
 
 socket.on("new message", handleNewMessage);

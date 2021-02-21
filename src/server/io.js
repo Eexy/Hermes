@@ -8,6 +8,7 @@ let rooms = new Map();
 
 // setting general rooms
 rooms.set('general', {name: 'general', users: [], messages: []})
+rooms.set('temp', {name: 'temp', users: [], messages: []})
 
 function connect(name, socket){
   // add the user to the list of users
@@ -27,10 +28,12 @@ function joinRoom(roomName, user, socket){
   // we send them the new list of user
   io.to(roomName).emit('user join', [user, ...rooms.get(roomName).users]);
 
-  // We had the new user to the room
+  // We had the new user to the room if the user isn't already in the room
   let room = rooms.get(roomName);
-  room.users.push(user);
-  rooms.set(roomName, room);
+  if(!room.users.find(temp => temp.id = user.id)){
+    room.users.push(user);
+    rooms.set(roomName, room);
+  }
   
   // We sent back to the user his new room and connect it's socket to the room
   socket.join(socket.id);
@@ -44,12 +47,15 @@ function handleNewMessage(message){
   room.messages.push(message);
   rooms.set(message.dest, room);
 
-  // We send the event to all the people in the room
   io.to(message.dest).emit('new message', message);
 }
 
 io.on("connection", (socket) => {
   socket.on('user connect', (name) => connect(name, socket));
+
+  socket.on('join room', (roomName, id) => {
+    joinRoom(roomName, users.find(user => user.id == id), socket);
+  });
 
   socket.on('new message', handleNewMessage);
 });
