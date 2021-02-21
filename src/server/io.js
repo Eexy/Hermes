@@ -22,25 +22,36 @@ function connect(name, socket){
   joinRoom('general', user, socket);
 }
 
-function joinRoom(room, user, socket){
+function joinRoom(roomName, user, socket){
   // we inform all the user that someone enter the room
   // we send them the new list of user
-  io.to(room).emit('user join', [user, ...rooms.get(room).users]);
+  io.to(roomName).emit('user join', [user, ...rooms.get(roomName).users]);
 
   // We had the new user to the room
-  let value = rooms.get(room);
-  value.users.push(user);
-  rooms.set(room, value);
+  let room = rooms.get(roomName);
+  room.users.push(user);
+  rooms.set(roomName, room);
   
-  // We sent back to the user his new room
-  // and connect it's socket to the room
+  // We sent back to the user his new room and connect it's socket to the room
   socket.join(socket.id);
-  socket.join('general');
-  io.to(socket.id).emit('join room', rooms.get(room));
+  socket.join(roomName);
+  io.to(socket.id).emit('join room', rooms.get(roomName));
+}
+
+function handleNewMessage(message){
+  // We add the message to the list of messages in the right room by looking at the destination
+  let room = rooms.get(message.dest);
+  room.messages.push(message);
+  rooms.set(message.dest, room);
+
+  // We send the event to all the people in the room
+  io.to(message.dest).emit('new message', message);
 }
 
 io.on("connection", (socket) => {
   socket.on('user connect', (name) => connect(name, socket));
+
+  socket.on('new message', handleNewMessage);
 });
 
 http.listen(PORT, () => console.log(`Chat server listening port ${PORT}`));

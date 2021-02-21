@@ -4,6 +4,21 @@ const me = { id: null, name: null, dest: null };
 const form = document.querySelector('#form');
 const messageInput = document.querySelector('#message-input');
 
+form.addEventListener('submit', sendMessage)
+
+function sendMessage(e){
+  e.preventDefault();
+  if(messageInput.value){
+    const message = {
+      from: me.id,
+      dest: me.dest,
+      message: messageInput.value
+    };
+
+    socket.emit('new message', message);
+  }
+}
+
 function getUserName() {
   let name = prompt("Enter your name please: ");
   if (name != null) {
@@ -62,3 +77,17 @@ socket.on("user join", (users) => {
   console.log(users);
   getUsersList(users)
 });
+
+function handleNewMessage(message){
+  const messagesList = document.querySelector('.messages');
+
+  // create message element
+  const li = document.createElement('li');
+  li.classList.add('message');
+  li.textContent = message.message;
+
+  // append the new message and scroll to the bottom
+  messagesList.appendChild(li);
+}
+
+socket.on("new message", handleNewMessage);
