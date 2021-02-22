@@ -25,7 +25,7 @@ section{
   border-right: 1px solid black;
 }
 
-.messages, .users__list, .rooms__list{
+.messages, .users__list, .chats-list{
   padding: 0;
   list-style: none;
   overflow-y: auto;
@@ -43,7 +43,7 @@ section{
   width: 200px;
 }
 
-.room:hover, .user:hover{
+.chat:hover, .user:hover{
   cursor: pointer;
   background: blue;
   color: white;
