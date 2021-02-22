@@ -21,17 +21,37 @@ main{
   padding: 0.5rem;
 }
 
-.messages, .users-list{
+section{
+  border-right: 1px solid black;
+}
+
+.messages, .users__list, .chats-list{
   padding: 0;
   list-style: none;
   overflow-y: auto;
 }
 
+.section__title{
+  text-align: center;
+  padding: 0.3rem;
+  border-bottom: 1px solid black;
+}
 
-.users-list{
+
+.users__list{
   display: none;
   width: 200px;
-  border-right: 1px solid black;
+}
+
+.chat:hover, .user:hover{
+  cursor: pointer;
+  background: blue;
+  color: white;
+}
+
+.active{
+  background: blue;
+  color: white;
 }
 
 li{
@@ -69,7 +89,7 @@ li{
 }
 
 @media screen and (min-width: 950px){
-  .users-list{
+  .users__list{
     display: block;
   }
 }
