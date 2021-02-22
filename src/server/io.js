@@ -8,6 +8,9 @@ let users = [];
 const messagesService = new MessagesService();
 
 function connect(socket){
+  // we put the user in the general room
+  socket.join('general');
+
   const user = {
     id: socket.id,
     username: socket.handshake.auth.username
@@ -32,7 +35,21 @@ function disconnect(socket){
 function handleNewMessage(socket, message){
   messagesService.saveMessage(message);
 
-  socket.broadcast.emit('new message', message);
+  socket.to(message.to).emit('new message', message);
+}
+
+function handleSwitchChat(socket, options){
+  const type = options.chatType;
+  const dest = options.chatId;
+
+  let messages = [];
+  if(type === 'room'){
+    messages = messagesService.getMessages({to: dest});
+  }else{
+    messages = messagesService.getMessagesBetweenUser(socket.id, dest);
+  }
+
+  io.to(socket.id).emit('messages', messages);
 }
 
 io.on("connection", (socket) => {
@@ -42,6 +59,8 @@ io.on("connection", (socket) => {
   socket.on('disconnect', () => disconnect(socket));
 
   socket.on('new message', (message) => handleNewMessage(socket, message));
+
+  socket.on('switch chat', (options) => handleSwitchChat(socket, options));
 });
 
 http.listen(PORT, () => console.log(`Chat server listening port ${PORT}`));
