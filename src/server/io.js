@@ -8,6 +8,9 @@ let users = [];
 const messagesService = new MessagesService();
 
 function connect(socket){
+  // we put the user in the general room
+  socket.join('general');
+
   const user = {
     id: socket.id,
     username: socket.handshake.auth.username
@@ -32,13 +35,13 @@ function disconnect(socket){
 function handleNewMessage(socket, message){
   messagesService.saveMessage(message);
 
-  socket.broadcast.emit('new message', message);
+  socket.to(message.to).emit('new message', message);
 }
 
 function handleSwitchChat(socket, options){
   const type = options.chatType;
   const dest = options.chatId;
-
+  
   let messages = [];
   if(type === 'room'){
     messages = messagesService({to: dest});

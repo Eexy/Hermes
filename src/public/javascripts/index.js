@@ -16,6 +16,8 @@ function sendMessage(e) {
       to: currentDest,
       message: messageInput.value,
     };
+    // we reset the input field
+    messageInput.value = "";
 
     // we append the new message to the list of message
     newMessage(message);
@@ -26,15 +28,23 @@ function sendMessage(e) {
 }
 
 function newMessage(message) {
-  const messagesList = document.querySelector(".messages");
-  const messageElement = document.createElement("li");
-  messageElement.classList.add("message");
-
-  // we get the user's who send the message
+  // we get the sender's username
   const user = users.find((user) => user.id == message.from);
-
-  messageElement.textContent = `${user.username}: ${message.message}`;
-  messagesList.appendChild(messageElement);
+  
+  // we check if the message is for us
+  if (message.to === socket.id) {
+    createChat(message.from);
+  } else {
+    // we check if we are in the correct room
+    if (currentDest === message.to) {
+      // if we are in the correct room we add the message to the messages list
+      const messagesList = document.querySelector(".messages");
+      const messageElement = document.createElement("li");
+      messageElement.classList.add("message");
+      messageElement.textContent = `${user.username}: ${message.message}`;
+      messagesList.appendChild(messageElement);
+    }
+  }
 }
 
 socket.on("new message", newMessage);
@@ -55,40 +65,40 @@ function init() {
 function switchChat(e) {
   const chat = e.target;
   const chatId = chat.dataset.id;
-  const chatType = chat.dataset.type;
+  const chatType = chat.dataset.chatType;
   // we change the destination for the user message
   currentDest = chatId;
 
   // we make the selected chat the active one
-  const chats = document.querySelectorAll('.chat');
+  const chats = document.querySelectorAll(".chat");
   chats.forEach((element) => {
-    if(element.classList.contains('active')){
-      element.classList.remove('active');
+    if (element.classList.contains("active")) {
+      element.classList.remove("active");
     }
   });
-  chat.classList.add('active');
+  chat.classList.add("active");
 
   // we tell the server we want the messages from the selected chat
-  socket.emit('switch chat', {chatType, chatId});
+  socket.emit("switch chat", { chatType, chatId });
 }
 
-function createChat(e){
-  const user = e.target;
-  const userId = user.dataset.id;
+function createChat(id) {
+  const userId = id;
+  let user = users.find((el) => el.id === id)
 
   // We check if the chat doesn't already in the chats list
-  const chatList = document.querySelector('.chats-list');
-  const chats = [...document.querySelectorAll('.chat')];
+  const chatList = document.querySelector(".chats-list");
+  const chats = [...document.querySelectorAll(".chat")];
   const chatExist = chats.every((chat) => chat.dataset.id !== userId);
 
-  if(chatExist){
-    const chat = document.createElement('li');
-    chat.classList.add('chat');
+  if (chatExist) {
+    const chat = document.createElement("li");
+    chat.classList.add("chat");
     chat.dataset.chatType = "chat";
     chat.dataset.id = userId;
-    chat.textContent = user.textContent;
+    chat.textContent = user.username;
 
-    chat.addEventListener('click', switchChat);
+    chat.addEventListener("click", switchChat);
     chatList.appendChild(chat);
   }
 }
@@ -110,7 +120,7 @@ function updateUsersList(_users) {
     userElement.classList.add("user");
     userElement.dataset.id = user.id;
     userElement.textContent = user.username;
-    userElement.addEventListener('click', createChat);
+    userElement.addEventListener("click", () => createChat(user.id));
     usersList.appendChild(userElement);
   });
 }
