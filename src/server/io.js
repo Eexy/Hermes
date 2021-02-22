@@ -17,6 +17,9 @@ function connect(socket){
 
   // We emit to everyone the new users list
   io.emit('users', users);
+
+  // When the user connect we send him the message
+  socket.emit('new messages', messagesService.getMessages({to: 'general'}));
 }
 
 function disconnect(socket){
