@@ -11,7 +11,6 @@ class MessagesService{
 
   getMessages(opt){
     const messages = this.messages.filter((message) => this.filterMessage(message, opt));
-
     return messages;
   }
 
@@ -20,7 +19,7 @@ class MessagesService{
     let isValid = true;
     
     keys.forEach((key) => {
-      if(message[prop] !== opt[key]){
+      if(message[key] !== opt[key]){
         isValid = false;
       }
     });

@@ -19,15 +19,20 @@ function connect(socket){
   io.emit('users', users);
 
   // When the user connect we send him the message
-  socket.emit('new messages', messagesService.getMessages({to: 'general'}));
+  io.to(socket.id).emit('messages', messagesService.getMessages({to: 'general'}));
 }
 
 function disconnect(socket){
   // We create a new array of user without the one who just disconnect
   users = users.filter((user) => user.id !== socket.id);
-
   // We emit to everyone the new users list
   io.emit('users', users);
+}
+
+function handleNewMessage(socket, message){
+  messagesService.saveMessage(message);
+
+  socket.broadcast.emit('new message', message);
 }
 
 io.on("connection", (socket) => {
@@ -35,6 +40,8 @@ io.on("connection", (socket) => {
   connect(socket);
   
   socket.on('disconnect', () => disconnect(socket));
+
+  socket.on('new message', (message) => handleNewMessage(socket, message));
 });
 
 http.listen(PORT, () => console.log(`Chat server listening port ${PORT}`));
