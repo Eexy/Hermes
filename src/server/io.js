@@ -41,10 +41,10 @@ function handleNewMessage(socket, message){
 function handleSwitchChat(socket, options){
   const type = options.chatType;
   const dest = options.chatId;
-  
+
   let messages = [];
   if(type === 'room'){
-    messages = messagesService({to: dest});
+    messages = messagesService.getMessages({to: dest});
   }else{
     messages = messagesService.getMessagesBetweenUser(socket.id, dest);
   }

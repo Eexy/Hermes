@@ -15,14 +15,14 @@ class MessagesService{
   }
 
   getMessagesBetweenUser(user1, user2){
-    const messages = this.messages.filter((message) => {
+    let messages = [];
+    
+    this.messages.forEach((message) => {
       if(message.to === user1 && message.from === user2){
-        return true;
+        messages.push(message);
       }else if(message.to === user2 && message.from === user1){
-        return true;
+        messages.push(message);
       }
-
-      return false;
     });
 
     return messages;

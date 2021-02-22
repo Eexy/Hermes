@@ -30,19 +30,19 @@ function sendMessage(e) {
 function newMessage(message) {
   // we get the sender's username
   const user = users.find((user) => user.id == message.from);
-  
-  // we check if the message is for us
-  if (message.to === socket.id) {
-    createChat(message.from);
-  } else {
-    // we check if we are in the correct room
-    if (currentDest === message.to) {
-      // if we are in the correct room we add the message to the messages list
-      const messagesList = document.querySelector(".messages");
-      const messageElement = document.createElement("li");
-      messageElement.classList.add("message");
-      messageElement.textContent = `${user.username}: ${message.message}`;
-      messagesList.appendChild(messageElement);
+
+  // we check if we are in the correct room
+  if (currentDest === message.to || currentDest === message.from) {
+    // if we are in the correct room we add the message to the messages list
+    const messagesList = document.querySelector(".messages");
+    const messageElement = document.createElement("li");
+    messageElement.classList.add("message");
+    messageElement.textContent = `${user.username}: ${message.message}`;
+    messagesList.appendChild(messageElement);
+  }else{
+    // if it is a private message and there is no chat yet we create a new chat
+    if(message.to === socket.id){
+      createChat(message.from);
     }
   }
 }
@@ -84,7 +84,7 @@ function switchChat(e) {
 
 function createChat(id) {
   const userId = id;
-  let user = users.find((el) => el.id === id)
+  let user = users.find((el) => el.id === id);
 
   // We check if the chat doesn't already in the chats list
   const chatList = document.querySelector(".chats-list");
@@ -128,6 +128,8 @@ function updateUsersList(_users) {
 socket.on("users", updateUsersList);
 
 function getMessages(messages) {
+  console.log(messages);
+
   const messagesList = document.querySelector(".messages");
 
   // we delete all the previous messages
