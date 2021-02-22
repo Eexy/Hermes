@@ -2,7 +2,7 @@ const URL = "http://localhost:3000";
 const socket = io(URL, { autoConnect: false });
 const form = document.querySelector("#form");
 const messageInput = document.querySelector("#message-input");
-let currentDest = 'general';
+let currentDest = "general";
 let users = [];
 
 form.addEventListener("submit", sendMessage);
@@ -37,17 +37,63 @@ function newMessage(message) {
   messagesList.appendChild(messageElement);
 }
 
-socket.on('new message', newMessage);
+socket.on("new message", newMessage);
 
-function getUserName() {
+function init() {
   let username = prompt("Enter username please: ");
   if (username) {
     socket.auth = { username };
     socket.connect();
+
+    // we select the general chat
+    const general = document.querySelector('[data-id="general"]');
+    general.classList.add("active");
+    general.addEventListener("click", switchChat);
   }
 }
 
-getUserName();
+function switchChat(e) {
+  const chat = e.target;
+  const chatId = chat.dataset.id;
+  const chatType = chat.dataset.type;
+  // we change the destination for the user message
+  currentDest = chatId;
+
+  // we make the selected chat the active one
+  const chats = document.querySelectorAll('.chat');
+  chats.forEach((element) => {
+    if(element.classList.contains('active')){
+      element.classList.remove('active');
+    }
+  });
+  chat.classList.add('active');
+
+  // we tell the server we want the messages from the selected chat
+  socket.emit('switch chat', {chatType, chatId});
+}
+
+function createChat(e){
+  const user = e.target;
+  const userId = user.dataset.id;
+
+  // We check if the chat doesn't already in the chats list
+  const chatList = document.querySelector('.chats-list');
+  const chats = [...document.querySelectorAll('.chat')];
+  const chatExist = chats.every((chat) => chat.dataset.id !== userId);
+
+  if(chatExist){
+    const chat = document.createElement('li');
+    chat.classList.add('chat');
+    chat.dataset.chatType = "chat";
+    chat.dataset.id = userId;
+    chat.textContent = user.textContent;
+
+    chat.addEventListener('click', switchChat);
+    chatList.appendChild(chat);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", init);
 
 function updateUsersList(_users) {
   // We update our array of users
@@ -64,6 +110,7 @@ function updateUsersList(_users) {
     userElement.classList.add("user");
     userElement.dataset.id = user.id;
     userElement.textContent = user.username;
+    userElement.addEventListener('click', createChat);
     usersList.appendChild(userElement);
   });
 }
@@ -83,4 +130,4 @@ function getMessages(messages) {
   });
 }
 
-socket.on("messages", getMessages)
+socket.on("messages", getMessages);

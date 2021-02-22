@@ -35,6 +35,20 @@ function handleNewMessage(socket, message){
   socket.broadcast.emit('new message', message);
 }
 
+function handleSwitchChat(socket, options){
+  const type = options.chatType;
+  const dest = options.chatId;
+
+  let messages = [];
+  if(type === 'room'){
+    messages = messagesService({to: dest});
+  }else{
+    messages = messagesService.getMessagesBetweenUser(socket.id, dest);
+  }
+
+  io.to(socket.id).emit('messages', messages);
+}
+
 io.on("connection", (socket) => {
   // Each time someone connect we update the list of user
   connect(socket);
@@ -42,6 +56,8 @@ io.on("connection", (socket) => {
   socket.on('disconnect', () => disconnect(socket));
 
   socket.on('new message', (message) => handleNewMessage(socket, message));
+
+  socket.on('switch chat', (options) => handleSwitchChat(socket, options));
 });
 
 http.listen(PORT, () => console.log(`Chat server listening port ${PORT}`));

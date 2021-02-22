@@ -14,6 +14,20 @@ class MessagesService{
     return messages;
   }
 
+  getMessagesBetweenUser(user1, user2){
+    const messages = this.messages.filter((message) => {
+      if(message.to === user1 && message.from === user2){
+        return true;
+      }else if(message.to === user2 && message.from === user1){
+        return true;
+      }
+
+      return false;
+    });
+
+    return messages;
+  }
+
   filterMessage(message, opt){
     const keys = Object.keys(opt);
     let isValid = true;
