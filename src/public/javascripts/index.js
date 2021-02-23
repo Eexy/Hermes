@@ -32,7 +32,7 @@ function newMessage(message) {
   const user = users.find((user) => user.id == message.from);
 
   // we check if we are in the correct room
-  if (currentDest === message.to || currentDest === message.from) {
+  if (currentDest === message.to || (currentDest === message.from && message.to === socket.id)) {
     // if we are in the correct room we add the message to the messages list
     const messagesList = document.querySelector(".messages");
     const messageElement = document.createElement("li");
@@ -40,9 +40,19 @@ function newMessage(message) {
     messageElement.textContent = `${user.username}: ${message.message}`;
     messagesList.appendChild(messageElement);
   }else{
+    let dest = message.to;
+
     // if it is a private message and there is no chat yet we create a new chat
     if(message.to === socket.id){
       createChat(message.from);
+      dest = message.from;
+    }
+
+    // We  indicate that there is a new messages from the chat
+    const chat = document.querySelector(`.chat[data-id="${dest}"]`);
+
+    if(chat){
+      chat.classList.add('new-message');
     }
   }
 }
@@ -77,6 +87,9 @@ function switchChat(e) {
     }
   });
   chat.classList.add("active");
+
+  // we remove the new-messages badge
+  chat.classList.remove('new-message');
 
   // we tell the server we want the messages from the selected chat
   socket.emit("switch chat", { chatType, chatId });
@@ -128,8 +141,6 @@ function updateUsersList(_users) {
 socket.on("users", updateUsersList);
 
 function getMessages(messages) {
-  console.log(messages);
-
   const messagesList = document.querySelector(".messages");
 
   // we delete all the previous messages
