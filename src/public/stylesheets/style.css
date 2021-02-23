@@ -1,6 +1,6 @@
 *{
   margin: 0;
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
 }
 
 html, body{
@@ -86,6 +86,28 @@ li{
   border: none;
   color: white;
   cursor: pointer;
+}
+
+.chat{
+  display: flex;
+  position: relative;
+  align-items: center;
+  padding: 1rem 3rem 1rem 0.5rem;
+}
+
+.new-message::after{
+  content: 'N';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  height: 20px;
+  width: 20px;
+  background: blue;
+  border-radius: 50%;
+  position: absolute;
+  right: 10px;
+  text-align: center;
 }
 
 @media screen and (min-width: 950px){
